@@ -94,12 +94,41 @@ jobs:
                   ref: refs/tags/${{needs.tag.outputs.tag}}
             - name: Install project dependencies
               uses: jdx/mise-action@v4
-            - name: Build and package release assets
-              run: opa build -b cape/ -o cape-opa-bundle.tar.gz
+            - name: Test OPA policies
+              run: opa test policies/ -v
+            - name: Build policy bundle
+              run: |
+                  chmod +x scripts/build_policy_bundle.sh
+                  ./scripts/build_policy_bundle.sh ${{needs.tag.outputs.tag}}
+            - name: Generate checksums
+              run: |
+                  cd dist
+                  sha256sum * > checksums.txt
+                  cat checksums.txt
             - uses: softprops/action-gh-release@v2
               name: Tag Release
               with:
                   name: ${{needs.tag.outputs.tag}}
                   tag_name: refs/tags/${{needs.tag.outputs.tag}}
-                  files: cape-opa-bundle.tar.gz
+                  files: |
+                      dist/policy-bundle-${{needs.tag.outputs.tag}}.tar.gz
+                      dist/checksums.txt
+                  body: |
+                      Release ${{needs.tag.outputs.tag}}
+                      
+                      ## Artifacts
+                      
+                      - `policy-bundle-${{needs.tag.outputs.tag}}.tar.gz` - OPA policy bundle
+                      - `checksums.txt` - SHA256 checksums
+                      
+                      ## Deployment
+                      
+                      Deploy with Ansible:
+                      ```yaml
+                      # group_vars/all.yml
+                      opa_policy_version: "${{needs.tag.outputs.tag}}"
+                      ```
+                      ```bash
+                      ansible-playbook deploy_opa_bundles.yml
+                      ```
                   generate_release_notes: true
