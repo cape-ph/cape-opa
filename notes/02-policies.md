@@ -2,31 +2,48 @@
 
 ## Current State
 
-**Implemented**: `cape/capeallow.rego`
-- Simple allow-all policy for initial testing
-- Used to verify decision logging works
+**✅ IMPLEMENTED (Phase 2 Complete)**:
+- `policies/cape/authorize.rego` - Main authorization policy with tributary-based access control
+- `policies/cape/user_writeable_resources.rego` - Query policy for listing writable resources
+- `policies/tests/authorize_test.rego` - 3 authorization tests (all passing)
+- `policies/tests/user_writeable_resources_test.rego` - 4 query tests (all passing)
+- `policies/.manifest.template` - Bundle manifest template for builds
+- `scripts/build_policy_bundle.sh` - Build script for creating policy bundles
+- All policies use Rego v1 syntax for OPA 1.18.0 compatibility
 
-**Not Yet Implemented**: Full authorization policies (complete code below)
+**❌ NOT YET IMPLEMENTED**:
+- `policies/cape/user_readable_resources.rego` - Query policy for readable resources (future)
+- `policies/cape/helpers.rego` - Shared utility functions (future, may not be needed)
 
-## Planned Repository Structure
+## Repository Structure (Implemented)
 
 ```
 policies/
 ├── cape/
-│   ├── authorize.rego                  # Main authorization logic
-│   ├── user_writeable_resources.rego   # Query: writable paths
-│   ├── user_readable_resources.rego    # Query: readable paths (future)
-│   └── helpers.rego                    # Shared utility functions (future)
+│   ├── authorize.rego                  # Main authorization logic ✅
+│   └── user_writeable_resources.rego   # Query: writable paths ✅
 ├── tests/
-│   ├── authorize_test.rego
-│   ├── user_writeable_resources_test.rego
-│   └── test_data.json
-└── .manifest.template                   # Bundle manifest template
+│   ├── authorize_test.rego             # Authorization tests ✅
+│   └── user_writeable_resources_test.rego  # Query tests ✅
+└── .manifest.template                   # Bundle manifest template ✅
+
+(Future additions)
+├── cape/
+│   ├── user_readable_resources.rego    # Query: readable paths (future)
+│   └── helpers.rego                    # Shared utility functions (if needed)
 ```
 
-## Complete Policy Code
+**Note**: Test data is embedded directly in test files using Rego v1 syntax, not in separate JSON files.
 
-### policies/.manifest.template
+## Policy Code (Implemented)
+
+**Note**: All policies use Rego v1 syntax with `import rego.v1` and `if` keywords for OPA 1.18.0 compatibility. The actual implementation differs slightly from original specs to use proper Rego v1 syntax:
+- Rules use `if` keyword before body
+- Defaults use `:=` operator
+- Function definitions use `if` keyword
+- Tests use separate `cape_test` package to avoid circular dependencies
+
+### policies/.manifest.template ✅
 
 ```json
 {
@@ -42,9 +59,9 @@ policies/
 
 Variables `${GIT_COMMIT}`, `${VERSION}`, `${BUILD_TIMESTAMP}` are substituted by `build_policy_bundle.sh` script.
 
-### policies/cape/authorize.rego
+### policies/cape/authorize.rego ✅
 
-Complete main authorization policy:
+Main authorization policy (implemented):
 
 ```rego
 package cape
@@ -144,9 +161,9 @@ get_user_status(user_id) = status {
 }
 ```
 
-### policies/cape/user_writeable_resources.rego
+### policies/cape/user_writeable_resources.rego ✅
 
-Query policy for listing writable resources:
+Query policy for listing writable resources (implemented):
 
 ```rego
 package cape
@@ -177,11 +194,45 @@ user_writeable_resources[resource_info] {
 }
 ```
 
-## Complete Test Code
+## Test Code (Implemented)
 
-### policies/tests/authorize_test.rego
+**Note**: Tests use `cape_test` package (separate from `cape` policy package) and inline mock data with Rego v1 syntax.
 
-Complete test suite with fixtures:
+### policies/tests/authorize_test.rego ✅
+
+Authorization test suite (implemented, 3 tests passing):
+
+**Note**: The actual implementation uses `package cape_test` and inline mock data with `with data.field as value` syntax instead of `with data as test_data`. This avoids circular dependency issues in OPA 1.18.0. See `policies/tests/authorize_test.rego` for the complete working implementation.
+
+Example test structure (simplified):
+```rego
+package cape_test
+
+import rego.v1
+import data.cape
+
+test_allow_write_to_tributary_resource if {
+    cape.allow with input as {
+        "user": {"id": 1},
+        "action": "write",
+        "resource": {
+            "type": "s3",
+            "path": "s3://test-bucket/eng/raw-uploads/file.csv"
+        }
+    } with data.user_tributaries as [
+        {"user_id": 1, "tributary_id": 1},
+        ...
+    ] with data.resources as [
+        {"id": 1, "tributary_id": 1, "resource_identifier": "s3://test-bucket/eng/raw-uploads/", "access_pattern": "write"},
+        ...
+    ] with data.user_attributes as [
+        {"user_id": 1, "attribute_key": "user_status", "attribute_value": "active"},
+        ...
+    ]
+}
+```
+
+Original example (for reference only - does not work with OPA 1.18.0):
 
 ```rego
 package cape
