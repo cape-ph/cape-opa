@@ -92,8 +92,8 @@ jobs:
               name: Checkout new tag
               with:
                   ref: refs/tags/${{needs.tag.outputs.tag}}
-            - name: Install OPA version 1.4.2
-              run: curl -L -o ./opa https://openpolicyagent.org/downloads/v1.4.2/opa_linux_amd64_static
+            - name: Install OPA version 1.18.0
+              run: curl -L -o ./opa https://openpolicyagent.org/downloads/v1.18.0/opa_linux_amd64_static
             - name: Make OPA executable
               run: chmod +x ./opa
             - name: Build and package release assets

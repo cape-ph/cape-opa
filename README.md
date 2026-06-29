@@ -1,29 +1,71 @@
-# CAPE OPA Policy Bundle Repo
+# CAPE OPA Authorization Policies
 
-This repo contains a living set of OPA policy bundles to be deployed as part of
-CAPE's authorization implementation.
+OPA (Open Policy Agent) policy bundles for CAPE's attribute-based access control (ABAC).
 
-## Setup
-This setup is only required to author/build/test policies and run OPA locally. 
-In the context of a CAPE deployment, OPA runs on its own EC2 insance and 
-operates on policy bundles it has been dconfigured to fetch.
+> **Repository Rename Notice**: This repository was renamed from `cape-opa-policy` to `cape-opa`. 
+> If you have an existing clone, update your remote: `git remote set-url origin git@github.com:cape-ph/cape-opa.git`
 
-- make sure you have `opa` installed (tested on 1.4.2, which was the latest
-  at time of writing). 
-  [Installation instructions can be found here][opa-install-instructions]
+> **Restructuring in Progress**: This repository is undergoing active restructuring to implement 
+> the complete CAPE authorization architecture. Directory structure and workflows will see 
+> significant changes in the near term.
 
+## Development Setup
 
-## Repo Structure
+### Prerequisites
 
-This repo contains the following subdirectories:
+- [mise](https://mise.jdx.dev/) - Tool version management
 
-- `cape` - The top-level directory of the policy bundle built by this repo.
+### Quick Start
 
-## Build the Bundle
-`opa build -b cape/ -o <bundle tar.gz filename>`
+```bash
+# Install required tools (python, opa)
+mise install
 
-## Testing Things
-***TBD***
+# Install Python development tools
+pip install -r requirements-dev.txt
 
-<!--Reference links-->
-[opa-install-instructions]: https://www.openpolicyagent.org/docs/latest/#1-download-opa
+# Verify installations
+python --version  # 3.11.x
+opa version       # 1.18.0
+```
+
+## Current Structure
+
+```
+cape-opa/
+├── cape/           # Current OPA policies
+├── AGENTS.md       # Agent development guidelines
+└── notes/          # Architecture documentation (for agents)
+```
+
+## Testing
+
+### Test Policies
+
+```bash
+opa test cape/ -v
+```
+
+### Format Code (when Python code exists)
+
+```bash
+black .
+isort .
+ruff check .
+```
+
+## Releases
+
+Releases are created via GitHub Actions workflow.
+
+**To create a release**:
+1. Go to GitHub Actions tab
+2. Run "CAPE OPA Bundle Release" workflow (manual dispatch)
+3. Release tagged with current date: `YYYY.MM.DD[.revision]`
+
+**Release artifacts**:
+- `cape-opa-bundle.tar.gz` - OPA policy bundle
+
+## License
+
+Apache-2.0 (see LICENSE file)

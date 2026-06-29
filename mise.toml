@@ -1,0 +1,4 @@
+[tools]
+python = "3.11"
+opa = "1.18.0"
+opencode = "latest"

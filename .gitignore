@@ -3,3 +3,28 @@ venv/
 .DS_Store
 assets-untracked/
 out/
+.design/
+
+# Python
+__pycache__/
+*.pyc
+.Python
+env/
+ENV/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
