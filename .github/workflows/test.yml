@@ -1,0 +1,17 @@
+name: CAPE OPA Test
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+jobs:
+    build:
+        name: Test OPA Build
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install project dependencies
+              uses: jdx/mise-action@v4
+            - name: Build and package release assets
+              run: opa build -b cape/ -o cape-opa-bundle.tar.gz

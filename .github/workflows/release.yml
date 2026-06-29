@@ -92,12 +92,10 @@ jobs:
               name: Checkout new tag
               with:
                   ref: refs/tags/${{needs.tag.outputs.tag}}
-            - name: Install OPA version 1.4.2
-              run: curl -L -o ./opa https://openpolicyagent.org/downloads/v1.4.2/opa_linux_amd64_static
-            - name: Make OPA executable
-              run: chmod +x ./opa
+            - name: Install project dependencies
+              uses: jdx/mise-action@v4
             - name: Build and package release assets
-              run: ./opa build -b cape/ -o cape-opa-bundle.tar.gz
+              run: opa build -b cape/ -o cape-opa-bundle.tar.gz
             - uses: softprops/action-gh-release@v2
               name: Tag Release
               with:
