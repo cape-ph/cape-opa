@@ -6,12 +6,14 @@ on:
     pull_request:
 
 jobs:
-    build:
-        name: Test OPA Build
+    test:
+        name: Test OPA Policies
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
             - name: Install project dependencies
               uses: jdx/mise-action@v4
-            - name: Build and package release assets
-              run: opa build -b cape/ -o cape-opa-bundle.tar.gz
+            - name: Run OPA policy tests
+              run: opa test policies/ -v
+            - name: Build policy bundle
+              run: opa build -b policies/cape/ -o cape-opa-policy-bundle.tar.gz

@@ -1,0 +1,9 @@
+{
+  "revision": "${GIT_COMMIT}",
+  "roots": ["cape"],
+  "metadata": {
+    "version": "${VERSION}",
+    "built_at": "${BUILD_TIMESTAMP}",
+    "repository": "https://github.com/cape-ph/cape-opa"
+  }
+}
